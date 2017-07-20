@@ -1,0 +1,140 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<api context="/stock" name="stockAPI" xmlns="http://ws.apache.org/ns/synapse">
+    <resource methods="GET" uri-template="/abc/{symbol}">
+        <inSequence>
+            <log description="recLogger" level="custom">
+                <property name="W***********" value="&quot;reccccccccccccccccc&quot;"/>
+            </log>
+            <property description="method" expression="$trp:method" name="method" scope="default" type="STRING"/>
+            <switch source="get-property('method')">
+                <case regex="getQuote">
+                    <property description="symbol" expression="get-property('uri.var.symbol')" name="symbol" scope="default" type="STRING"/>
+                    <payloadFactory description="restToSoap" media-type="xml">
+                        <format>
+                            <soapenv:Envelope xmlns:ser="http://services.samples" xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/" xmlns:xsd="http://services.samples/xsd">
+                                <soapenv:Header/>
+                                <soapenv:Body>
+                                    <ser:getQuote>
+                                        <ser:request>
+                                            <xsd:symbol>$1</xsd:symbol>
+                                        </ser:request>
+                                    </ser:getQuote>
+                                </soapenv:Body>
+                            </soapenv:Envelope>
+                        </format>
+                        <args>
+                            <arg evaluator="xml" expression="get-property('symbol')"/>
+                        </args>
+                    </payloadFactory>
+                    <property name="SOAPAction" scope="transport" type="STRING" value="urn:getQuote"/>
+                    <send/>
+                </case>
+                <case regex="getFullQuote">
+                    <property description="symbol" expression="get-property('uri.var.symbol')" name="symbol" scope="default" type="STRING"/>
+                    <payloadFactory description="restToSoap" media-type="xml">
+                        <format>
+                            <soapenv:Envelope xmlns:ser="http://services.samples" xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/" xmlns:xsd="http://services.samples/xsd">
+                                <soapenv:Header/>
+                                <soapenv:Body>
+                                    <ser:getFullQuote>
+                                        <ser:request>
+                                            <xsd:symbol>$1</xsd:symbol>
+                                        </ser:request>
+                                    </ser:getFullQuote>
+                                </soapenv:Body>
+                            </soapenv:Envelope>
+                        </format>
+                        <args>
+                            <arg evaluator="xml" expression="get-property('symbol')"/>
+                        </args>
+                    </payloadFactory>
+                    <property name="SOAPAction" scope="transport" type="STRING" value="urn:getFullQuote"/>
+                    <send>
+                        <endpoint key="stock"/>
+                    </send>
+                </case>
+                <case regex="getMarketActivity">
+                    <property description="symbol" expression="get-property('uri.var.symbol')" name="symbol" scope="default" type="STRING"/>
+                    <payloadFactory description="restToSoap" media-type="xml">
+                        <format>
+                            <soapenv:Envelope xmlns:ser="http://services.samples" xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/" xmlns:xsd="http://services.samples/xsd">
+                                <soapenv:Header/>
+                                <soapenv:Body>
+                                    <ser:getMarketActivity>
+                                        <ser:request>
+                                            <xsd:symbol>$1</xsd:symbol>
+                                        </ser:request>
+                                    </ser:getMarketActivity>
+                                </soapenv:Body>
+                            </soapenv:Envelope>
+                        </format>
+                        <args>
+                            <arg evaluator="xml" expression="get-property('symbol')"/>
+                        </args>
+                    </payloadFactory>
+                    <property name="SOAPAction" scope="transport" type="STRING" value="urn:getMarketActivity"/>
+                    <send>
+                        <endpoint key="stock"/>
+                    </send>
+                </case>
+                <case regex="getSimpleQuote">
+                    <property description="symbol" expression="get-property('uri.var.symbol')" name="symbol" scope="default" type="STRING"/>
+                    <payloadFactory description="restToSoap" media-type="xml">
+                        <format>
+                            <soapenv:Envelope xmlns:ser="http://services.samples" xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/" xmlns:xsd="http://services.samples/xsd">
+                                <soapenv:Header/>
+                                <soapenv:Body>
+                                    <ser:getSimpleQuote>
+                                        <ser:request>
+                                            <xsd:symbol>$1</xsd:symbol>
+                                        </ser:request>
+                                    </ser:getSimpleQuote>
+                                </soapenv:Body>
+                            </soapenv:Envelope>
+                        </format>
+                        <args>
+                            <arg evaluator="xml" expression="get-property('symbol')"/>
+                        </args>
+                    </payloadFactory>
+                    <property name="SOAPAction" scope="transport" type="STRING" value="urn:getSimpleQuote"/>
+                    <send>
+                        <endpoint key="stock"/>
+                    </send>
+                </case>
+                <case regex="placeOrder">
+                    <property description="symbol" expression="get-property('uri.var.symbol')" name="symbol" scope="default" type="STRING"/>
+                    <payloadFactory description="restToSoap" media-type="xml">
+                        <format>
+                            <soapenv:Envelope xmlns:ser="http://services.samples" xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/" xmlns:xsd="http://services.samples/xsd">
+                                <soapenv:Header/>
+                                <soapenv:Body>
+                                    <ser:placeOrder>
+                                        <ser:order>
+                                            <xsd:price>$2</xsd:price>
+                                            <xsd:quantity>$3</xsd:quantity>
+                                            <xsd:symbol>$1</xsd:symbol>
+                                        </ser:order>
+                                    </ser:placeOrder>
+                                </soapenv:Body>
+                            </soapenv:Envelope>
+                        </format>
+                        <args>
+                            <arg evaluator="xml" expression="get-property('symbol')"/>
+                            <arg evaluator="xml" expression="$trp:price"/>
+                            <arg evaluator="xml" expression="$trp:quantity"/>
+                        </args>
+                    </payloadFactory>
+                    <property name="SOAPAction" scope="transport" type="STRING" value="urn:placeOrder"/>
+                    <send>
+                        <endpoint key="stock"/>
+                    </send>
+                </case>
+                <default/>
+            </switch>
+        </inSequence>
+        <outSequence>
+            <send/>
+        </outSequence>
+        <faultSequence/>
+    </resource>
+</api>
