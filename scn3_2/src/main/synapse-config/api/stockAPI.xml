@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<api context="/stock" name="stockAPI" xmlns="http://ws.apache.org/ns/synapse">
+    <resource methods="GET" uri-template="/abc/{symbol}">
+        <inSequence>
+            <log description="recLogger" level="custom">
+                <property name="W***********" value="&quot;reccccccccccccccccc&quot;"/>
+            </log>
+            <property description="symbol" expression="get-property('uri.var.symbol')" name="symbol" scope="default" type="STRING"/>
+            <log description="sybolLogger" level="custom">
+                <property expression="get-property('symbol')" name="########FFFFFF"/>
+            </log>
+            <payloadFactory description="restToSoap" media-type="xml">
+                <format>
+                    <soapenv:Envelope xmlns:ser="http://services.samples" xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/" xmlns:xsd="http://services.samples/xsd">
+                        <soapenv:Header/>
+                        <soapenv:Body>
+                            <ser:getQuote>
+                                <ser:request>
+                                    <xsd:symbol>$1</xsd:symbol>
+                                </ser:request>
+                            </ser:getQuote>
+                        </soapenv:Body>
+                    </soapenv:Envelope>
+                </format>
+                <args>
+                    <arg evaluator="xml" expression="get-property('symbol')"/>
+                </args>
+            </payloadFactory>
+            <property name="SOAPAction" scope="transport" type="STRING" value="urn:getQuote"/>
+            <log description="full" level="full"/>
+            <send>
+                <endpoint key="stock"/>
+            </send>
+        </inSequence>
+        <outSequence>
+            <send/>
+        </outSequence>
+        <faultSequence/>
+    </resource>
+</api>
